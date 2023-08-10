@@ -1,0 +1,107 @@
+/* /Shared/Game.razor.rz.scp.css */
+.play-area[b-c30ul4k1ji] {
+    outline: none;
+    cursor: pointer;
+}
+.play-area:focus[b-c30ul4k1ji] {
+    outline: none;
+}
+/* /Shared/Logo.razor.rz.scp.css */
+span[b-gt9hgh3kso] {
+    height: 1.6em;
+    width: 1.6em;
+    color: #1E2124;
+    background-color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: white;
+    user-select: none;
+    display: inline-block;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+/* /Shared/MainLayout.razor.rz.scp.css */
+/* /Shared/PuzzleDrawer.razor.rz.scp.css */
+.block-row[b-40bdjbeh19] {
+    text-align: center;
+}
+
+.block[b-40bdjbeh19] {
+    display: inline-block;
+    margin: 6px;
+}
+
+.row[b-40bdjbeh19] {
+    
+}
+
+.cell[b-40bdjbeh19] {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    margin: 4px; 
+    font-size: 150%;
+
+    cursor: pointer;
+    
+    background-color: #36393e;
+    color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: white;
+    user-select: none;
+}
+.cell .notes[b-40bdjbeh19] {
+    margin: 0;
+    font-size: 35%;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    word-wrap: break-word;
+    overflow-wrap:break-word;
+    white-space: initial;
+}
+
+.cell:hover[b-40bdjbeh19] {
+    border-color: #D89216;
+}
+
+.cell.wrong[b-40bdjbeh19] {
+    background-color: rgb(174, 0, 0) !important;
+}
+
+.cell.highlight[b-40bdjbeh19] {
+    background-color: #7289da;
+}
+
+.cell.selected[b-40bdjbeh19] {
+    background-color: #D89216;
+}
+
+.cell.selected:hover[b-40bdjbeh19] {
+    border-color: #5f3e04 !important;
+}
+/* /Shared/StatisticsRenderer.razor.rz.scp.css */
+.cell[b-izr3q0zcgz] {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    margin: 4px; 
+
+    cursor: pointer;
+
+    color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(126, 126, 126);
+    user-select: none;
+}
+
+table td[b-izr3q0zcgz] {
+    vertical-align: middle;
+    text-align: center;
+}
