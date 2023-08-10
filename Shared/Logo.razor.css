@@ -12,3 +12,9 @@ span {
     margin-left: 4px;
     margin-right: 4px;
 }
+
+@media (max-width: 480px) {
+    span {
+        font-size: 50%;
+    }   
+}

@@ -28,6 +28,14 @@
     border-color: white;
     user-select: none;
 }
+@media (max-width: 640px) {
+    .cell {
+        width: 28px;
+        height: 28px;
+        font-size: 100%;
+    }   
+}
+
 .cell .notes {
     margin: 0;
     font-size: 35%;
