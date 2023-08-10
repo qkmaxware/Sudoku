@@ -1,0 +1,71 @@
+@page "/vizualizer"
+
+<PageTitle>Sudoku | Generator Visualizer</PageTitle>
+
+<Logo IsDebug=true></Logo>
+<PuzzleDrawer @ref=drawer Puzzle=@Puzzle></PuzzleDrawer>
+
+<button @onclick=generateWhole>Generate</button>
+|
+<button @onclick=restart>Restart</button>
+<button @onclick=nextStep>Next (@(step)/@(9*9))</button>
+
+@code {
+    private PuzzleDrawer? drawer;
+    public Puzzle? Puzzle {get; set;} = null;
+    private WavefunctionCollapseGenerator generator = new WavefunctionCollapseGenerator();
+    
+    private void restart() {
+        this.Puzzle = new Puzzle();
+        generator.InitializeSuperposition(this.Puzzle);
+        this.step = 0;
+    }
+
+    public void generateWhole() {
+        this.drawer?.ClearHighlighting();
+        this.drawer?.Select(null);
+
+        var puzzle = generator.Generate();
+        foreach (var cell in puzzle) {
+            cell.EnteredValue = cell.ActualValue;
+        }
+        this.Puzzle = puzzle;
+    }
+
+    private int step = 0;
+    private void nextStep() {
+        if (this.Puzzle == null)
+            return;
+
+        if (this.step >= 9*9)
+            return;
+
+        this.drawer?.ClearHighlighting();
+        var cell = generator.Collapse(this.Puzzle);
+        if (cell == null)
+            return;
+
+        foreach (var c in this.Puzzle) {
+            if (c.ActualValue != 0) {
+                c.EnteredValue = c.ActualValue;
+            }
+        }
+
+        foreach (var otherInRow in cell.Row) {
+            this.drawer?.Highlight(otherInRow);
+        }
+        foreach (var otherInColumn in cell.Column) {
+            this.drawer?.Highlight(otherInColumn);
+        }
+        foreach (var otherInBlock in cell.Block) {
+            this.drawer?.Highlight(otherInBlock);
+        }
+
+        this.drawer?.Select(cell);
+        this.step++;
+    }
+
+    private bool isValidLocn(int x, int y) {
+        return x >= 0 && x < 9 && y >= 0 && y < 9;
+    }
+}

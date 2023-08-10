@@ -1,0 +1,61 @@
+.block-row {
+    text-align: center;
+}
+
+.block {
+    display: inline-block;
+    margin: 6px;
+}
+
+.row {
+    
+}
+
+.cell {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    margin: 4px; 
+    font-size: 150%;
+
+    cursor: pointer;
+    
+    background-color: #36393e;
+    color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: white;
+    user-select: none;
+}
+.cell .notes {
+    margin: 0;
+    font-size: 35%;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    word-wrap: break-word;
+    overflow-wrap:break-word;
+    white-space: initial;
+}
+
+.cell:hover {
+    border-color: #D89216;
+}
+
+.cell.wrong {
+    background-color: rgb(174, 0, 0) !important;
+}
+
+.cell.highlight {
+    background-color: #7289da;
+}
+
+.cell.selected {
+    background-color: #D89216;
+}
+
+.cell.selected:hover {
+    border-color: #5f3e04 !important;
+}

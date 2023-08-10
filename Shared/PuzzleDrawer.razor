@@ -1,0 +1,59 @@
+@if(Puzzle != null) {
+for (var block_row = 0; block_row < 3; block_row++) {
+    <div class="block-row"> 
+    @for (var block_col = 0; block_col < 3; block_col++) {
+        <div class="block">
+            @for (var cell_row = 0; cell_row < 3; cell_row++) {
+                <div class="row">
+                    @for (var cell_col = 0; cell_col < 3; cell_col++) {
+                        var col = block_col * 3 + cell_col;
+                        var row = block_row * 3 + cell_row;
+                        var cell = Puzzle.GetCell(col, row);
+                        <span title="Cell(@(col),@(row))" class="w3-display-container cell @(highlighted.Contains(cell) ? HighlightCss : string.Empty) @(selected == cell ? SelectedCss : string.Empty) @(cell.IsEnteredValueWrong ? WrongCss : string.Empty)" @onclick=@(() => Select(cell))>
+                            <span class="w3-display-middle">
+                                @if (cell.EnteredValue.HasValue) {
+                                    <text>@cell.EnteredValue.Value</text>
+                                } else {
+                                    <text>&nbsp;</text>
+                                }
+                            </span>
+                            <span class="notes">@(string.Join(' ', cell.PotentialValues))&nbsp;</span>
+                        </span>
+                    }
+                </div>
+            }
+        </div>
+    }
+    </div>
+}
+}
+
+@code {
+
+    private Cell? selected;
+    private HashSet<Cell> highlighted = new HashSet<Cell>();
+    private static readonly string HighlightCss = "highlight";
+    private static readonly string SelectedCss = "selected";
+    private static readonly string WrongCss = "wrong";
+
+    [Parameter] public Puzzle? Puzzle {get; set;} = new Puzzle();
+    [Parameter] public Action<Cell>? OnSelect {get; set;}
+        [Parameter] public Action? OnDeselect {get; set;}
+
+    public void Deselect() => Select(null);
+    public void Select(Cell? cell) {
+        this.selected = cell;
+        if (!ReferenceEquals(cell, null)) {
+            OnSelect?.Invoke(cell);
+        } else {
+            OnDeselect?.Invoke();
+        }
+    }
+
+    public Cell? TryGetSelected() => selected;
+
+    public void Highlight(Cell cell) {
+        this.highlighted.Add(cell);
+    }
+    public void ClearHighlighting() => this.highlighted.Clear();
+}

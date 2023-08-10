@@ -1,0 +1,7 @@
+.play-area {
+    outline: none;
+    cursor: pointer;
+}
+.play-area:focus {
+    outline: none;
+}

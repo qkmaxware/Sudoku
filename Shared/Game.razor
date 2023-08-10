@@ -1,0 +1,203 @@
+@inject IJSRuntime js
+
+<Menu @ref="menu">
+    <MainMenu>
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => menu?.GotoGameOptions())>Play Now</button><br>
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => menu?.GotoStatistics())>Statistics</button><br>
+    </MainMenu>
+    <PlayOptions>
+        <label>Presets</label>
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => { NewPuzzleEasy(); menu?.GotoGameplay(); })>Easy</button><br>
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => { NewPuzzleMedium(); menu?.GotoGameplay(); })>Medium</button><br>
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => { NewPuzzleHard(); menu?.GotoGameplay(); })>Hard</button><br>
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => { NewPuzzleExtreme(); menu?.GotoGameplay(); })>Extreme</button><br>
+
+        <label>Custom</label>
+        <input type="range" min="0" max="100" class="w3-input" @bind=custom_percent @bind:event="oninput">
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity w3-white" style="width: 100%" @onclick=@(() => { NewPuzzleCustom(); menu?.GotoGameplay(); })>@(custom_percent)% Exposed </button><br>
+    </PlayOptions>
+    <Statistics>
+        <StatisticsRenderer Stats=@gameStats></StatisticsRenderer>
+    </Statistics>
+    <Gameplay>
+        <div @onkeyup=pressChar tabindex="0" class='play-area'>
+            <div class="w3-center">
+                <Timer @ref=gameTimer></Timer> | Mistakes: @(new string('x', mistakes))
+            </div>
+            <PuzzleDrawer @ref=drawer Puzzle=@currentPuzzle OnSelect=select OnDeselect=deselect></PuzzleDrawer>
+        </div>
+        <div class="w3-center">
+        @for(var i = 1; i < 10; i++) {
+            var digit = i;
+            <button class="w3-button w3-round w3-gray" style='margin: 2px;' @onclick=@(() => PlayDigit(digit))>@i</button>
+        }
+        <button class="w3-button w3-round w3-gray" style='margin: 2px;' @onclick=@(() => ClearWrongDigit())>⌫</button>
+        </div>
+    </Gameplay>
+</Menu>
+
+<Modal @ref="success">
+    <Head>
+        <h2 class="w3-center">Congratuations!!</h2>
+        <div class="w3-center">
+            You have completed this puzzle in @completionTime with @mistakes mistakes.
+        </div>
+    </Head>
+    <Body>
+        <StatisticsRenderer Stats=@gameStats></StatisticsRenderer>
+    </Body>
+    <Footer>
+        <div class="w3-center w3-padding">
+            <button class="w3-button w3-round w3-gray w3-margin-right" @onclick=@(() => success?.Hide())>Close</button>
+            <button class="w3-button w3-round w3-gray w3-margin-left" @onclick=@(() => { success?.Hide(); menu?.GotoRoot(); })>Close & Return Home</button>
+        </div>
+    </Footer>
+</Modal>
+
+@code {
+    private Statistics? gameStats;
+    private Menu? menu;
+    private IPuzzleGenerator generator = new BacktrackingGenerator();
+    private Timer? gameTimer;
+    private PuzzleDrawer? drawer;
+    private Puzzle? currentPuzzle;  
+    private int mistakes = 0;
+
+    private Modal? success;
+    private TimeSpan completionTime;
+
+    protected override async Task OnAfterRenderAsync(bool first) {
+        if (first) {
+            await loadStats();
+        }
+    }
+
+    private static readonly string saveKey = "sudoku.statistics.json";
+    private async Task loadStats() {
+        var stats = await js.InvokeAsync<string>("window.localStorage.getItem", saveKey);
+        if (!string.IsNullOrEmpty(stats)) {
+            try {
+                var parsed = System.Text.Json.JsonSerializer.Deserialize<Statistics>(stats);
+                this.gameStats = parsed ?? new Statistics();
+            } catch {
+                this.gameStats = new Statistics();
+            }
+        }
+    }
+
+    private void saveStats() {
+        if (gameStats != null) {
+            js.InvokeVoidAsync("window.localStorage.setItem", saveKey, System.Text.Json.JsonSerializer.Serialize(this.gameStats));
+        }
+    }
+
+    public void NewPuzzleEasy() {
+        custom_percent = 75f;
+        NewPuzzleCustom();
+    }
+
+    public void NewPuzzleMedium() {
+        custom_percent = 50f;
+        NewPuzzleCustom();
+    }
+
+    public void NewPuzzleHard() {
+        custom_percent = 25f;
+        NewPuzzleCustom();
+    }
+
+    public void NewPuzzleExtreme() {
+        custom_percent = 10f;
+        NewPuzzleCustom();
+    }
+
+    private float custom_percent = 50f;
+    public void NewPuzzleCustom() {
+        this.mistakes = 0;
+        this.currentPuzzle = MakePuzzlePercentExposed(custom_percent / 100f);
+        gameTimer?.StartTimer();
+        StateHasChanged();
+    }
+
+    private Random rng = new Random();
+
+    public Puzzle MakePuzzlePercentExposed(float percent) {
+        percent = MathF.Max(0, MathF.Min(percent, 1)); // 0 to 1;
+        const int cellCount = 9*9;
+        int cells = (int)(percent * cellCount);        // 0 to 9*9
+
+        var puzzle = generator.Generate();
+        var allCells = puzzle.ToList();
+        allCells.Shuffle();
+
+        foreach (var cell in allCells.Take(cells)) {
+            cell.EnteredValue = cell.ActualValue;
+        }
+
+        return puzzle;
+    }
+
+    private void pressChar(KeyboardEventArgs e) {
+        if (e.Key.Length == 1 && char.IsDigit(e.Key[0])) {
+            PlayDigit(int.Parse(e.Key));
+        }
+    }
+
+    private void select(Cell cell) {
+        this.drawer?.ClearHighlighting();
+
+        if (ReferenceEquals(this.currentPuzzle, null))
+            return;
+
+        if (cell.EnteredValue.HasValue && cell.EnteredValue.Value == cell.ActualValue) {
+            highlightWithNumber(cell.ActualValue);
+        }
+    }
+
+    private void highlightWithNumber(int num) {
+        foreach (var c in this.currentPuzzle) {
+            if (c.EnteredValue.HasValue && c.EnteredValue.Value == c.ActualValue && c.ActualValue == num) {
+                this.drawer?.Highlight(c);
+            }
+        }
+    }
+
+    private void deselect() {
+        this.drawer?.ClearHighlighting();
+    }
+
+    public void PlayDigit(int digit) {
+        var cell = drawer?.TryGetSelected();
+        highlightWithNumber(digit);
+        if (cell != null && (!cell.EnteredValue.HasValue || cell.IsEnteredValueWrong)) {
+            cell.EnteredValue = digit;
+            if (cell.IsEnteredValueWrong) {
+                mistakes++;
+            } else {
+                if (currentPuzzle?.IsSolved() ?? false) {
+                    // Congrats!!
+                    gameTimer?.StopTimer();
+                    if (gameTimer != null) {
+                        completionTime = gameTimer.Ellapsed();
+                    }
+                    if (gameStats == null) {
+                        gameStats = new Statistics();
+                    }
+                    gameStats.CompleteGame(custom_percent, completionTime);
+                    saveStats();
+                    success?.Show();
+                } else {
+                    // Continue
+                }
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void ClearWrongDigit() {
+        var cell = drawer?.TryGetSelected();
+        if (cell != null && (cell.EnteredValue.HasValue && cell.IsEnteredValueWrong)) {
+            cell.EnteredValue = null;
+        }
+    }
+}

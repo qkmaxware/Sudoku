@@ -1,0 +1,60 @@
+
+<div class="@(current == State.Root? show : hide)" style="width: 360px; max-width: 100%; margin-left:auto; margin-right: auto;">
+    @MainMenu
+</div>
+<div class="@(current == State.Options? show : hide)" style="width: 360px; max-width: 100%; margin-left:auto; margin-right: auto;">
+    @PlayOptions
+    <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity back" style="width: 100%" @onclick=gotoRoot>&lt; Back</button><br>
+</div>
+<div class="@(current == State.Statistics? show : hide)" style="width: 360px; max-width: 100%; margin-left:auto; margin-right: auto;">
+    @Statistics
+    <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity back" style="width: 100%" @onclick=gotoRoot>&lt; Back</button><br>
+</div>
+<div class="@(current == State.Gameplay? show : hide)" >
+    @Gameplay
+    <div style="width: 360px; max-width: 100%; margin-left:auto; margin-right: auto;">
+        <button class="w3-button w3-round w3-margin-bottom w3-animate-opacity back" style="width: 100%" @onclick=gotoRoot>&lt; Back</button><br>
+    </div>
+</div>
+
+@code {
+    private static string show = "w3-show";
+    private static string hide = "w3-hide";
+    public enum State {
+        Root,
+        Options,
+        Statistics,
+        Gameplay
+    }
+
+    private State current = State.Root;
+
+    [Parameter] public RenderFragment? MainMenu {get; set;}
+    [Parameter] public RenderFragment? PlayOptions {get; set;}
+    [Parameter] public RenderFragment? Statistics {get; set;}
+    [Parameter] public RenderFragment? Gameplay {get; set;}
+
+    private void gotoRoot() {
+        this.current = State.Root;
+    }
+
+    public void GotoRoot() {
+        this.current = State.Root;
+        StateHasChanged();
+    } 
+
+    public void GotoGameOptions() {
+        this.current = State.Options;
+        StateHasChanged();
+    } 
+
+    public void GotoStatistics() {
+        this.current = State.Statistics;
+        StateHasChanged();
+    } 
+
+    public void GotoGameplay() {
+        this.current = State.Gameplay;
+        StateHasChanged();
+    } 
+}

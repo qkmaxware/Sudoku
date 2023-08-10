@@ -1,0 +1,40 @@
+@implements IDisposable
+
+<span>
+    Time: @(seconds)s
+</span>
+
+@code {
+    int seconds = 0;
+    private System.Threading.Timer? timer;
+
+    protected override void OnInitialized() {
+		// NOTE: THE FOLLOWING CODE ADDED
+		StartTimer();
+    }
+
+    public void StartTimer() {
+        StopTimer();
+
+        seconds = 0;
+        timer = new System.Threading.Timer((object? stateInfo) => {
+            seconds += 1;
+			StateHasChanged(); // NOTE: MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
+		}, new System.Threading.AutoResetEvent(false), 1000, 1000); // fire every 2000 milliseconds
+        StateHasChanged();
+    }
+
+    public void StopTimer() {
+        this.timer?.Dispose();
+        timer = null;
+        StateHasChanged();
+    }
+
+    public TimeSpan Ellapsed() {
+        return TimeSpan.FromSeconds(this.seconds);
+    }
+
+    public void Dispose() {
+        StopTimer();
+    }
+}

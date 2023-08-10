@@ -1,0 +1,48 @@
+@using System.Drawing
+
+<div class="w3-padding">
+@if (Stats == null || Stats.Games == null) {
+    <span>No games played. Statistics will update here as games you play more games.</span>
+} else {
+    <table class="w3-table">
+        <thead>
+            <th>Difficulty</th> <th>Best</th> <th>Average</th> <th>Games</th>
+        </thead>
+        <tbody>
+            @foreach (var row in Stats.Games.OrderByDescending(game => game.PercentExposed)) {
+                <tr>
+                    <td>
+                        <span class="cell w3-display-container" style="background-color: @(interpolate(Color.Red, Color.Green, row.PercentExposed / 100f));">
+                            <span class="w3-display-middle">@(row.PercentExposed)%</span>
+                        </span>
+                    </td>
+                    <td>
+                        @TimeSpan.FromSeconds(row.FastestTimeSeconds)
+                    </td>
+                    <td>
+                        @TimeSpan.FromSeconds(row.AverageTimeSeconds())
+                    </td>
+                    <td>
+                        @row.GamesPlayed
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+</div>
+
+@code {
+    [Parameter] public Statistics? Stats {get; set;}
+
+    private string interpolate(Color from, Color to, float amt) {
+        if (amt < 0)
+            amt = 0;
+        if (amt > 1)
+            amt = 1;
+        var R =  (int)((to.R-from.R) * amt + from.R);
+        var G =  (int)((to.G-from.G) * amt + from.G);
+        var B =  (int)((to.B-from.B) * amt + from.B);
+        return $"#{R:X2}{G:X2}{B:X2}";
+    }
+}

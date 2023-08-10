@@ -1,0 +1,14 @@
+span {
+    height: 1.6em;
+    width: 1.6em;
+    color: #1E2124;
+    background-color: white;
+    border-radius: 8px; 
+    border-width: 2px;
+    border-style: solid;
+    border-color: white;
+    user-select: none;
+    display: inline-block;
+    margin-left: 4px;
+    margin-right: 4px;
+}

@@ -1,0 +1,15 @@
+<h1 class="w3-center no-select">
+    <span class="w3-animate-zoom">S</span>
+    <span class="w3-animate-zoom">U</span>
+    <span class="w3-animate-zoom">D</span>
+    <span class="w3-animate-zoom">O</span>
+    <span class="w3-animate-zoom">K</span>
+    <span class="w3-animate-zoom">U</span>
+    @if (IsDebug) {
+        <sub>DEBUG</sub>
+    }
+</h1>
+
+@code {
+    [Parameter] public bool IsDebug {get; set;}
+}
