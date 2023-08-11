@@ -81,7 +81,11 @@
         <div class="w3-center">
         @for(var i = 1; i < 10; i++) {
             var digit = i;
-            <button class="w3-button w3-round w3-gray" style='margin: 2px;' @onclick=@(() => PlayDigit(digit))>@i</button>
+            @if (remainingDigits.ContainsKey(digit) && remainingDigits[digit] > 0) {
+                <button class="w3-button w3-round w3-gray" style='margin: 2px;' @onclick=@(() => PlayDigit(digit))>@i</button>
+            } else {
+                <button class="w3-button w3-round w3-dark-gray" style='margin: 2px;'>@i</button>
+            }
         }
         <button class="w3-button w3-round w3-gray" style='margin: 2px;' @onclick=@(() => ClearWrongDigit())>⌫</button>
         </div>
@@ -167,6 +171,7 @@
     public void NewPuzzleCustom() {
         this.mistakes = 0;
         this.currentPuzzle = MakePuzzlePercentExposed(custom_percent / 100f);
+        checkRemainingDigits();
         gameTimer?.StartTimer();
         StateHasChanged();
     }
@@ -222,6 +227,7 @@
     }
 
     private void onCorrectDigitEntered() {
+        checkRemainingDigits();
         if (currentPuzzle?.IsSolved() ?? false) {
             // Congrats!!
             gameTimer?.StopTimer();
@@ -250,6 +256,26 @@
                 onCorrectDigitEntered();
             }
             StateHasChanged();
+        }
+    }
+
+    private Dictionary<int, int> remainingDigits = new Dictionary<int, int>();
+    private void addOrIncrement(Dictionary<int, int> dict, int key) {
+        if (dict.ContainsKey(key)) {
+            dict[key] += 1;
+        } else {
+            dict[key] = 1;
+        }
+    }
+    private void checkRemainingDigits() {
+        remainingDigits.Clear();
+        if (ReferenceEquals(this.currentPuzzle, null))
+            return;
+
+        foreach (var cell in this.currentPuzzle) {
+            if (!cell.EnteredValue.HasValue || cell.EnteredValue.Value != cell.ActualValue) {
+                addOrIncrement(remainingDigits, cell.ActualValue);
+            }
         }
     }
 
