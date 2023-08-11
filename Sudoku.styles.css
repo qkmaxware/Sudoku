@@ -1,3 +1,75 @@
+/* /Shared/Bubble.razor.rz.scp.css */
+.speech[b-w5psqc9cae] {
+    /* (A1) FONT */
+    font-family: arial, sans-serif;
+    font-size: 1.1em;
+  
+    /* (A2) COLORS */
+    color: #fff;
+    background: #7289da;;
+  
+    /* (A3) DIMENSIONS + POSITION */
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 12px;
+}
+  
+/* (B) ADD SPEECH "CALLOUT TAIL" */
+/* (B1) USE ::AFTER TO CREATE THE "TAIL" */
+.speech[b-w5psqc9cae]::after {
+    /* (B1-1) ATTACH TRANSPARENT BORDERS */
+    content: "";
+    border: 12px solid transparent;
+  
+    /* (B1-2) NECESSARY TO POSITION THE "TAIL" */
+    position: absolute;
+}
+  
+/* (B2) BOTTOM "CALLOUT TAIL" */
+.bottom.speech[b-w5psqc9cae]::after {
+    /* (B2-1) DOWN TRIANGLE */
+    border-top-color: #7289da;;
+    border-bottom: 0;
+  
+    /* (B2-2) POSITION AT BOTTOM */
+    bottom: -12px; left: 50%;
+    margin-left: -12px;
+}
+  
+/* (C) DIFFERENT TAIL POSITIONS */
+/* (C1) TOP */
+.top.speech[b-w5psqc9cae]::after {
+    /* (C1-1) UP TRIANGLE */
+    border-bottom-color: #7289da;;
+    border-top: 0;
+  
+    /* (C1-2) POSITION AT TOP */
+    top: -12px; left: 50%;
+    margin-left: -12px;
+}
+  
+/* (C2) LEFT */
+.left.speech[b-w5psqc9cae]::after {
+    /* (C2-1) LEFT TRIANGLE */
+    border-right-color: #7289da;;
+    border-left: 0;
+  
+    /* (C2-2) POSITION AT LEFT */
+    left: -10px; top: 50%;
+    margin-top: -12px;
+}
+  
+/* (C3) RIGHT */
+.right.speech[b-w5psqc9cae]::after {
+    /* (C3-1) RIGHT TRIANGLE */
+    border-left-color: #7289da;;
+    border-right: 0;
+  
+    /* (C3-2) POSITION AT RIGHT */
+    right: -10px; top: 50%;
+    margin-top: -12px;
+}
+  
 /* /Shared/Game.razor.rz.scp.css */
 .play-area[b-c30ul4k1ji] {
     outline: none;
@@ -67,13 +139,13 @@ img[b-gt9hgh3kso] {
     .block-row[b-40bdjbeh19] {}
     
     .block[b-40bdjbeh19] {
-        margin: 1px;
+        margin: 6px;
     }
 
     .cell[b-40bdjbeh19] {
-        margin: 0; 
-        width: 40px;
-        height: 40px;
+        margin: 0;
+        width: 36px;
+        height: 36px;
     }   
 }
 
@@ -107,6 +179,18 @@ img[b-gt9hgh3kso] {
 
 .cell.selected:hover[b-40bdjbeh19] {
     border-color: #5f3e04 !important;
+}
+/* /Shared/Sidebar.razor.rz.scp.css */
+nav[b-q1mcj88pqd] {
+    color: black;
+    position: fixed!important;
+    padding: 0;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 280px;
+    max-width: 100%;
+    overflow-y: auto;
 }
 /* /Shared/StatisticsRenderer.razor.rz.scp.css */
 .cell[b-izr3q0zcgz] {

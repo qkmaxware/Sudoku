@@ -12,8 +12,12 @@ a, .btn-link {
     color: #0071c1;
 }
 
-button.back {
+.back {
     background-color: #7289da;
+}
+
+.font-back {
+    color: #7289da;
 }
 
 .btn-primary {
