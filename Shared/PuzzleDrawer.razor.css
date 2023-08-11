@@ -29,10 +29,16 @@
     user-select: none;
 }
 @media (max-width: 640px) {
+    .block-row {}
+    
+    .block {
+        margin: 1px;
+    }
+
     .cell {
-        width: 28px;
-        height: 28px;
-        font-size: 100%;
+        margin: 0; 
+        width: 40px;
+        height: 40px;
     }   
 }
 
