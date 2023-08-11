@@ -1,0 +1,11 @@
+nav {
+    color: black;
+    position: fixed!important;
+    padding: 0;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 280px;
+    max-width: 100%;
+    overflow-y: auto;
+}

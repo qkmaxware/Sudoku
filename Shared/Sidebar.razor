@@ -1,0 +1,18 @@
+<nav class="w3-sidebar w3-bar-block w3-card w3-animate-right @(isVisible ? "w3-show" : "w3-hide")">
+    @ChildContent
+</nav>
+
+@code {
+    private bool isVisible = false;
+
+    public void Show() {
+        this.isVisible = true;
+        StateHasChanged();
+    }
+
+    public void Hide() {
+        this.isVisible = false;
+        StateHasChanged();
+    }
+    [Parameter] public RenderFragment? ChildContent {get; set;}
+}

@@ -115,6 +115,32 @@ public class Puzzle : IEnumerable<Cell> {
         }
     }
 
+    public IEnumerable<RowEnumerator> Rows {
+        get {
+            for (var i = 0; i < 9; i++) {
+                yield return new RowEnumerator(this, i);
+            }
+        }
+    }
+
+    public IEnumerable<ColumnEnumerator> Columns {
+        get {
+            for (var i = 0; i < 9; i++) {
+                yield return new ColumnEnumerator(this, i);
+            }
+        }
+    }
+
+    public IEnumerable<Block> Blocks {
+        get {
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 3; j++) {
+                    yield return blocks[i,j];
+                }
+            }
+        }
+    } 
+
     public bool IsSolved() {
         foreach (var cell in this) {
             if (!cell.EnteredValue.HasValue || cell.IsEnteredValueWrong) {

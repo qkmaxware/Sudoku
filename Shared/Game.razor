@@ -22,8 +22,60 @@
     <Gameplay>
         <div @onkeyup=pressChar tabindex="0" class='play-area'>
             <div class="w3-center">
+                <div style="text-align: right;">
+                    <button class="w3-button w3-round w3-flat" style="padding: 0px 12px;" @onclick=openHelp>
+                        <Bubble Arrow=@Bubble.Direction.right>Need help?</Bubble>
+                    </button>
+                </div>
                 <Timer @ref=gameTimer></Timer> | Mistakes: @(new string('x', mistakes))
             </div>
+            <Sidebar @ref=helpSidebar>
+                <div class="back w3-container w3-display-container w3-text-white" style="text-align: center">
+                    <span class="w3-button w3-flat w3-display-topleft" @onclick=hideHelp>&times;</span>
+                    <h2>Help!</h2>
+                </div>
+                <div class="w3-center">
+                @if (this.thinking) {
+                    <p class="w3-padding">Give me a minute...</p>
+                    <img style="width: 50%" src="favicons/sudoku_mascot.svg">
+                } else if (this.steps.Count <= 0 || !ReferenceEquals(this.solveError, null)) {
+                    <p class="w3-padding">I can show you how to solve this puzzle. Simply click the "Solve It!" button below and I can determine all the steps you need to get to the solution. Be patient, I am still a work in progress.</p>
+                    <img style="width: 50%" src="favicons/sudoku_mascot.svg">
+                    <div class="w3-margin-top w3-center">
+                        <button class="w3-button w3-round back" style="width: 90%;" @onclick=getSolutionSteps>Solve It!</button>
+                    </div>
+                    <div class="w3-padding">
+                        @this.solveError?.Message
+                    </div>
+                } else {
+                    <div class="w3-container" style="text-align: left;">
+                        <img style="width: 3em" src="favicons/sudoku_mascot.svg"> Here's the steps I took.<br>
+                    </div>
+                    <div class="w3-margin-top w3-center">
+                        <button class="w3-button w3-round back" style="width: 90%;" @onclick=@(() => this.steps.Clear())>Restart</button>
+                    </div>
+                    <div style="text-align: left; padding: 2px; margin-top: 8px;">
+                    @{
+                    var first = true;
+                    }
+                    @foreach (var step in this.steps) {
+                        <div class="w3-card w3-container w3-margin-bottom">
+                            <strong>@step.StepName()</strong>
+                            <p>@step.StepDescription()</p>
+                            @if (first) {
+                                var firstStep = step;
+                                <div style="text-align: right;">
+                                    <button class="w3-button w3-flat font-back" @onclick=@(() => showHelp(firstStep))>Show Me</button>
+                                    <button class="w3-button w3-flat font-back" @onclick=@(() => applyHelp(firstStep))>Do It</button>
+                                </div>
+                                first = false;
+                            }
+                        </div>
+                    }
+                    </div>
+                }
+                </div>
+            </Sidebar>
             <PuzzleDrawer @ref=drawer Puzzle=@currentPuzzle OnSelect=select OnDeselect=deselect></PuzzleDrawer>
         </div>
         <div class="w3-center">
@@ -155,6 +207,9 @@
     }
 
     private void highlightWithNumber(int num) {
+        if (ReferenceEquals(this.currentPuzzle, null))
+            return;
+
         foreach (var c in this.currentPuzzle) {
             if (c.EnteredValue.HasValue && c.EnteredValue.Value == c.ActualValue && c.ActualValue == num) {
                 this.drawer?.Highlight(c);
@@ -166,6 +221,24 @@
         this.drawer?.ClearHighlighting();
     }
 
+    private void onCorrectDigitEntered() {
+        if (currentPuzzle?.IsSolved() ?? false) {
+            // Congrats!!
+            gameTimer?.StopTimer();
+            if (gameTimer != null) {
+                completionTime = gameTimer.Ellapsed();
+            }
+            if (gameStats == null) {
+                gameStats = new Statistics();
+            }
+            gameStats.CompleteGame(custom_percent, completionTime);
+            saveStats();
+            success?.Show();
+        } else {
+            // Continue
+        }
+    }
+
     public void PlayDigit(int digit) {
         var cell = drawer?.TryGetSelected();
         highlightWithNumber(digit);
@@ -174,21 +247,7 @@
             if (cell.IsEnteredValueWrong) {
                 mistakes++;
             } else {
-                if (currentPuzzle?.IsSolved() ?? false) {
-                    // Congrats!!
-                    gameTimer?.StopTimer();
-                    if (gameTimer != null) {
-                        completionTime = gameTimer.Ellapsed();
-                    }
-                    if (gameStats == null) {
-                        gameStats = new Statistics();
-                    }
-                    gameStats.CompleteGame(custom_percent, completionTime);
-                    saveStats();
-                    success?.Show();
-                } else {
-                    // Continue
-                }
+                onCorrectDigitEntered();
             }
             StateHasChanged();
         }
@@ -199,5 +258,85 @@
         if (cell != null && (cell.EnteredValue.HasValue && cell.IsEnteredValueWrong)) {
             cell.EnteredValue = null;
         }
+    }
+
+    private Sidebar? helpSidebar;
+    private void openHelp() {
+        helpSidebar?.Show();
+    }
+    private void hideHelp() {
+        helpSidebar?.Hide();
+    }
+
+    private bool thinking = false;
+    private IPuzzleSolver solver = new InsightfulAStarSolver();
+    private List<SolutionStep> steps = new List<SolutionStep>();
+    private Exception? solveError = null;
+    private void getSolutionSteps() {
+        if (ReferenceEquals(this.currentPuzzle, null))
+            return;
+
+        if (thinking == false) {
+            thinking = true;
+            solveError = null;
+            steps.Clear();
+            var puz = this.currentPuzzle.DeepCopy();
+            Task.Run(async () => {
+                // Remove all "wrong entries"
+                foreach (var cell in puz) {
+                    if (cell.IsEnteredValueWrong) {
+                        cell.EnteredValue = null;
+                    }
+                }
+                // Send to solver
+                try {
+                    steps.AddRange(solver.Solve(puz));
+                } catch (Exception e) {
+                    solveError = e;
+                }
+                finally {
+                    thinking = false;
+                    await InvokeAsync(StateHasChanged);
+                }
+            });
+        }
+    }
+
+    private Cell? convertCellToCurrentPuzzle(Cell cell) {
+        if (ReferenceEquals(this.currentPuzzle, null))
+            return null;
+
+        var x = cell.CellX;
+        var y = cell.CellY;
+
+        return this.currentPuzzle.GetCell(x, y);
+    }
+
+    private IEnumerable<Cell> convertCellsToCurrentPuzzle(IEnumerable<Cell> cells) {
+        if (ReferenceEquals(this.currentPuzzle, null))
+            yield break;
+
+        foreach (var cell in cells) {
+            var convert = convertCellToCurrentPuzzle(cell);
+            if (!ReferenceEquals(convert, null))
+                yield return convert;
+        }
+    }
+
+    private void showHelp(SolutionStep step) {
+        this.drawer?.ClearHighlighting();
+        this.drawer?.Select(convertCellToCurrentPuzzle(step.Cell));
+        this.drawer?.Highlight(convertCellsToCurrentPuzzle(step.HintCells));
+    }
+
+    private void applyHelp(SolutionStep step) {
+        var cell = convertCellToCurrentPuzzle(step.Cell);
+        if (!ReferenceEquals(cell, null)) {
+            cell.EnteredValue = step.InputValue;
+            this.drawer?.Select(cell);
+            select(cell);
+        }
+        this.steps.Remove(step);
+        onCorrectDigitEntered();
     }
 }

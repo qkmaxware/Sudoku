@@ -38,7 +38,7 @@ for (var block_row = 0; block_row < 3; block_row++) {
 
     [Parameter] public Puzzle? Puzzle {get; set;} = new Puzzle();
     [Parameter] public Action<Cell>? OnSelect {get; set;}
-        [Parameter] public Action? OnDeselect {get; set;}
+    [Parameter] public Action? OnDeselect {get; set;}
 
     public void Deselect() => Select(null);
     public void Select(Cell? cell) {
@@ -48,12 +48,23 @@ for (var block_row = 0; block_row < 3; block_row++) {
         } else {
             OnDeselect?.Invoke();
         }
+        StateHasChanged();
     }
 
     public Cell? TryGetSelected() => selected;
 
     public void Highlight(Cell cell) {
         this.highlighted.Add(cell);
+        StateHasChanged();
     }
-    public void ClearHighlighting() => this.highlighted.Clear();
+    public void Highlight(IEnumerable<Cell> cells) {
+        foreach (var cell in cells) {
+            if (!ReferenceEquals(cell, null))
+                Highlight(cell);
+        }
+    }
+    public void ClearHighlighting() {
+        this.highlighted.Clear();
+        StateHasChanged();
+    }
 }

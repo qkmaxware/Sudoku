@@ -1,0 +1,71 @@
+.speech {
+    /* (A1) FONT */
+    font-family: arial, sans-serif;
+    font-size: 1.1em;
+  
+    /* (A2) COLORS */
+    color: #fff;
+    background: #7289da;;
+  
+    /* (A3) DIMENSIONS + POSITION */
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 12px;
+}
+  
+/* (B) ADD SPEECH "CALLOUT TAIL" */
+/* (B1) USE ::AFTER TO CREATE THE "TAIL" */
+.speech::after {
+    /* (B1-1) ATTACH TRANSPARENT BORDERS */
+    content: "";
+    border: 12px solid transparent;
+  
+    /* (B1-2) NECESSARY TO POSITION THE "TAIL" */
+    position: absolute;
+}
+  
+/* (B2) BOTTOM "CALLOUT TAIL" */
+.bottom.speech::after {
+    /* (B2-1) DOWN TRIANGLE */
+    border-top-color: #7289da;;
+    border-bottom: 0;
+  
+    /* (B2-2) POSITION AT BOTTOM */
+    bottom: -12px; left: 50%;
+    margin-left: -12px;
+}
+  
+/* (C) DIFFERENT TAIL POSITIONS */
+/* (C1) TOP */
+.top.speech::after {
+    /* (C1-1) UP TRIANGLE */
+    border-bottom-color: #7289da;;
+    border-top: 0;
+  
+    /* (C1-2) POSITION AT TOP */
+    top: -12px; left: 50%;
+    margin-left: -12px;
+}
+  
+/* (C2) LEFT */
+.left.speech::after {
+    /* (C2-1) LEFT TRIANGLE */
+    border-right-color: #7289da;;
+    border-left: 0;
+  
+    /* (C2-2) POSITION AT LEFT */
+    left: -10px; top: 50%;
+    margin-top: -12px;
+}
+  
+/* (C3) RIGHT */
+.right.speech::after {
+    /* (C3-1) RIGHT TRIANGLE */
+    border-left-color: #7289da;;
+    border-right: 0;
+  
+    /* (C3-2) POSITION AT RIGHT */
+    right: -10px; top: 50%;
+    margin-top: -12px;
+}
+  

@@ -32,13 +32,13 @@
     .block-row {}
     
     .block {
-        margin: 1px;
+        margin: 6px;
     }
 
     .cell {
-        margin: 0; 
-        width: 40px;
-        height: 40px;
+        margin: 0;
+        width: 36px;
+        height: 36px;
     }   
 }
 
