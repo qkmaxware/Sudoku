@@ -148,11 +148,11 @@ public abstract class AStarSolver : IPuzzleSolver {
         do {
             found = null;
             foreach (var reducer in reductions) {
-                found = LastInRow.TryReduce(puzzle) ?? found;
-            }
-            if (!ReferenceEquals(found, null)) { 
-                steps.Enqueue(found); 
-                continue; 
+                found = LastInRow.TryReduce(puzzle);
+                if (!ReferenceEquals(found, null)) { 
+                    steps.Enqueue(found); 
+                    break; 
+                }
             }
         } while (found != null);
 

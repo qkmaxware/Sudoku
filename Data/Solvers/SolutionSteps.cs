@@ -275,6 +275,12 @@ public class SingleElimination : SolutionStep {
                 }
                 cell.PotentialValues.Add(possible);
             }
+
+            // Safety check, same as "OnlyCandidate"
+            if (isSingleton(cell)) {
+                cell.EnteredValue = cell.PotentialValues.First();
+                return new OnlyCandidate(cell, cell.EnteredValue.Value);
+            }
         }
 
         // Perform more "in-depth" eliminations to create singletons
@@ -282,5 +288,9 @@ public class SingleElimination : SolutionStep {
         
 
         return null;
+    }
+
+    private static bool isSingleton(Cell cell) {
+        return cell.PotentialValues.Count == 1;
     }
 }
