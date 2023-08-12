@@ -114,7 +114,7 @@ public class OnlyCandidate : SolutionStep {
         this.HintCells.AddRange(cell.Column);
         this.HintCells.AddRange(cell.Block);
     }
-    public override string StepName() => "OnlyCandidate";
+    public override string StepName() => "Only candidate";
     public override string StepDescription() => "Each row, column, and block can only contain the numbers 1 to 9 exactly once";
 
     public static SolutionStep? TryReduce(Puzzle puzzle) {
@@ -245,10 +245,8 @@ public class Scanning : SolutionStep {
 /// 
 public class SingleElimination : SolutionStep {
 
-    public SingleElimination(Cell cell, int value, List<IEnumerable<Cell>> hints) : base(cell, value) {
-        foreach (var hint in hints) {
-            this.HintCells.AddRange(hint);
-        }
+    public SingleElimination(Cell cell, int value, IEnumerable<Cell> hints) : base(cell, value) {
+        this.HintCells.AddRange(hints);
     }
     public override string StepName() => "Single Elimination";
     public override string StepDescription() => "Slowly remove possible values from a cell eliminating these possibilities using the rows and columns from other parts of the puzzle";
@@ -284,26 +282,81 @@ public class SingleElimination : SolutionStep {
         }
 
         // Perform more "in-depth" eliminations to create singletons
-        Dictionary<Cell, List<IEnumerable<Cell>>> eliminations_leading_to_singleton = new Dictionary<Cell, List<IEnumerable<Cell>>>();
+        Dictionary<Cell, List<Cell>> eliminations_leading_to_singleton = new Dictionary<Cell, List<Cell>>();
         
         // If a value only can exist in 1 column/row then eliminate that value from the column/row in all blocks except the current one
         HashSet<int> remaining_digits_in_block = new HashSet<int>(9);
-        List<int> columnIndices = new List<int>(3);
-        List<int> rowIndices = new List<int>(3);
+        HashSet<int> columnIndices = new HashSet<int>(3);
+        HashSet<int> rowIndices = new HashSet<int>(3);
         foreach (var block in puzzle.Blocks) {
             remaining_digits_in_block.Clear();
             foreach (var digit in block.Where(x => !x.EnteredValue.HasValue).SelectMany(x => x.PotentialValues)) {
                 remaining_digits_in_block.Add(digit);
             }
 
-            columnIndices.Clear();
-            rowIndices.Clear();
             foreach (var digit in remaining_digits_in_block) {
+                columnIndices.Clear();
+                rowIndices.Clear();
 
+                // Record what rows/columns this digit can appear in for this block
+                foreach (var cell in block) {
+                    if (!cell.EnteredValue.HasValue && cell.PotentialValues.Contains(digit)) {
+                        rowIndices.Add(cell.CellY);
+                        columnIndices.Add(cell.CellX);
+                    }
+                }
+
+                // If it only appears in 1 row, remove it as an option from the rest of the row
+                if (rowIndices.Count == 1) {
+                    var rowIndex = rowIndices.First();
+                    var row = puzzle.Rows.ElementAt(rowIndex);
+                    foreach (var cell in row) {
+                        if (cell.Block != block) {
+                            cell.PotentialValues.Remove(digit);
+                            addCell(eliminations_leading_to_singleton, cell, row.Where(c => c.Block == block));
+                        }
+                    }
+                }
+                // If it only appears in 1 column, remove it as an option from the rest of the col
+                else if (columnIndices.Count == 1) {
+                    var colIndex = columnIndices.First();
+                    var col = puzzle.Columns.ElementAt(colIndex);
+                    foreach (var cell in col) {
+                        if (cell.Block != block) {
+                            cell.PotentialValues.Remove(digit);
+                            addCell(eliminations_leading_to_singleton, cell, col.Where(c => c.Block == block));
+                        }
+                    }
+                }
+                
+            }
+        }
+
+        foreach (var cell in puzzle.Cells) {
+            if (isSingleton(cell)) {
+                cell.EnteredValue = cell.PotentialValues.First();
+                return new SingleElimination(cell, cell.EnteredValue.Value, tryGetOrEmpty(eliminations_leading_to_singleton, cell));
             }
         }
 
         return null;
+    }
+
+    private static void addCell(Dictionary<Cell, List<Cell>> src, Cell deletedOn, IEnumerable<Cell> deletedCuz) {
+        List<Cell>? lst = null;
+        if (!src.TryGetValue(deletedOn, out lst)) {
+            lst = new List<Cell>();
+            src[deletedOn] = lst;
+        }
+        foreach (var cell in deletedCuz)
+            lst.Add(cell);
+    }
+    private static List<Cell> tryGetOrEmpty(Dictionary<Cell, List<Cell>> src, Cell key) {
+        List<Cell>? lst = null;
+        if (!src.TryGetValue(key, out lst)) {
+            lst = new List<Cell>();
+        }
+        return lst;
     }
 
     private static bool isSingleton(Cell cell) {

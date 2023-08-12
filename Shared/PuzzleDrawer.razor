@@ -2,7 +2,8 @@
 for (var block_row = 0; block_row < 3; block_row++) {
     <div class="block-row"> 
     @for (var block_col = 0; block_col < 3; block_col++) {
-        <div class="block">
+        var block_ind = block_row * 3 + block_col;
+        <div class="block @(block_ind % 2 == 0 ? EvenCss : OddCss)">
             @for (var cell_row = 0; cell_row < 3; cell_row++) {
                 <div class="row">
                     @for (var cell_col = 0; cell_col < 3; cell_col++) {
@@ -35,6 +36,8 @@ for (var block_row = 0; block_row < 3; block_row++) {
     private static readonly string HighlightCss = "highlight";
     private static readonly string SelectedCss = "selected";
     private static readonly string WrongCss = "wrong";
+    private static readonly string EvenCss = "even";
+    private static readonly string OddCss = "odd";
 
     [Parameter] public Puzzle? Puzzle {get; set;} = new Puzzle();
     [Parameter] public Action<Cell>? OnSelect {get; set;}

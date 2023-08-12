@@ -38,10 +38,7 @@ public abstract class AStarSolver : IPuzzleSolver {
     /// </summary>
     /// <param name="puzzle">puzzle to solve</param>
     /// <returns>solution steps</returns>
-    public IEnumerable<SolutionStep> Solve(Puzzle puzzle) {
-        var startNode = MakeNode(puzzle);
-        return aStar(startNode, (puzzle) => puzzle.IsSolved());
-    }
+    public abstract IEnumerable<SolutionStep> Solve(Puzzle puzzle);
 
     protected SearchNode MakeNode(Puzzle start, SearchNode? cameFrom = null) {
         Puzzle reduced = start.DeepCopy();
@@ -73,7 +70,7 @@ public abstract class AStarSolver : IPuzzleSolver {
     }
 
     // https://en.wikipedia.org/wiki/A*_search_algorithm
-    private IEnumerable<SolutionStep> aStar(SearchNode start, Predicate<Puzzle> goal) {
+    protected IEnumerable<SolutionStep> aStar(SearchNode start, Predicate<Puzzle> goal) {
         // If already done, be done
         if (goal(start.StateAfterReductions)) {
             return recursive_reconstruct_path(start);
@@ -167,6 +164,11 @@ public abstract class AStarSolver : IPuzzleSolver {
 /// A* Solver that knows what the actual value of each cell is (from the puzzle game data itself)
 /// </summary>
 public class InsightfulAStarSolver : AStarSolver {
+    public override IEnumerable<SolutionStep> Solve(Puzzle puzzle) {
+        var startNode = MakeNode(puzzle);
+        return aStar(startNode, (puzzle) => puzzle.IsSolved()); // Is solved has insight into the actual values
+    }    
+
     protected override IEnumerable<SearchNode> GenerateNeighbours(SearchNode current) {
         // For any "open" cell, pick a valid value to place in the cell
         foreach (var cell in current.StateAfterReductions) {
@@ -193,6 +195,10 @@ public class InsightfulAStarSolver : AStarSolver {
 /// A* Solver that makes no assumptions as to the value of each cell and works only off of entered data
 /// </summary>
 public class BlindAStarSolver : AStarSolver {
+    public override IEnumerable<SolutionStep> Solve(Puzzle puzzle) {
+        var startNode = MakeNode(puzzle);
+        return aStar(startNode, (puzzle) => puzzle.AreEnteredValuesValid()); // No insight into the actual values, does it match the rules of sudoku
+    }
     protected override IEnumerable<SearchNode> GenerateNeighbours(SearchNode current) {
         // For any "open" cell, pick a valid value to place in the cell
         foreach (var cell in current.StateAfterReductions) {
