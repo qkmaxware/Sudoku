@@ -126,28 +126,33 @@ public abstract class AStarSolver : IPuzzleSolver {
         return puzzle.Where(cell => !cell.EnteredValue.HasValue).Count();
     }
 
+
+    private static List<Func<Puzzle, SolutionStep?>> reductions = new List<Func<Puzzle, SolutionStep?>>{
+        // Check for "last possible value scenarios"
+        LastInRow.TryReduce,
+        LastInColumn.TryReduce,
+        LastInBlock.TryReduce,
+
+        // Check "basic" techniques
+        Scanning.TryReduce,
+        OnlyCandidate.TryReduce,
+
+        // TODO more
+    };
     protected virtual Queue<SolutionStep> Reduce(Puzzle puzzle) {
         Queue<SolutionStep> steps = new Queue<SolutionStep>();
 
         // Continue applying different reduction techniques until you can't anymore
         SolutionStep? found = null;
         do {
-            // Check for "only possible value scenarios"
-            found = LastInRow.TryReduce(puzzle);
-            if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
-            found = LastInColumn.TryReduce(puzzle);
-            if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
-            found = LastInBlock.TryReduce(puzzle);
-            if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
-
-            // Check "basic" eliminations
-            found = HiddenSingleSameRowAndColumn.TryReduce(puzzle);
-            if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
-            found = HiddenSingleDifferentRowsAndColumns.TryReduce(puzzle);
-            if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
-            // TODO double elimination
-
-            // Check "magic" eliminations
+            found = null;
+            foreach (var reducer in reductions) {
+                found = LastInRow.TryReduce(puzzle) ?? found;
+            }
+            if (!ReferenceEquals(found, null)) { 
+                steps.Enqueue(found); 
+                continue; 
+            }
         } while (found != null);
 
         // Return the reductions that have been applied, in order

@@ -11,7 +11,7 @@ public class Cell {
     public int ActualValue {get; set;}
     public int? EnteredValue {get; set;}
     public bool IsEnteredValueWrong => EnteredValue.HasValue && EnteredValue.Value != ActualValue;
-    public List<int> PotentialValues {get; private set;} = new List<int>();
+    public HashSet<int> PotentialValues {get; private set;} = new HashSet<int>();
 
     public Puzzle Puzzle => Block.Puzzle;
     public Block Block {get; private set;}
@@ -115,6 +115,16 @@ public class Puzzle : IEnumerable<Cell> {
         }
     }
 
+    public IEnumerable<Cell> Cells {
+        get {
+            for (var i = 0; i < 9; i++) {
+                for (var j = 0; j < 9; j++) {
+                    yield return this.GetCell(i,j);
+                }
+            }
+        }
+    }
+
     public IEnumerable<RowEnumerator> Rows {
         get {
             for (var i = 0; i < 9; i++) {
@@ -163,11 +173,7 @@ public class Puzzle : IEnumerable<Cell> {
     }
 
     public IEnumerator<Cell> GetEnumerator() {
-        for (var i = 0; i < 9; i++) {
-            for (var j = 0; j < 9; j++) {
-                yield return this.GetCell(i,j);
-            }
-        }
+        return this.Cells.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() {

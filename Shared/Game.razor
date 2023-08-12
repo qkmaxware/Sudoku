@@ -172,6 +172,7 @@
     public void NewPuzzleCustom() {
         this.mistakes = 0;
         this.steps.Clear();
+        this.hideHelp();
         this.currentPuzzle = MakePuzzlePercentExposed(custom_percent / 100f);
         checkRemainingDigits();
         gameTimer?.StartTimer();

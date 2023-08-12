@@ -107,13 +107,13 @@ public class LastInBlock : SolutionStep {
 /// <summary>
 /// A step where we look at row, column, and block to identify if a given cell can only take on 1 value
 /// </summary>
-public class HiddenSingleSameRowAndColumn : SolutionStep {
-    public HiddenSingleSameRowAndColumn(Cell cell, int value) : base(cell, value) {
+public class OnlyCandidate : SolutionStep {
+    public OnlyCandidate(Cell cell, int value) : base(cell, value) {
         this.HintCells.AddRange(cell.Row);
         this.HintCells.AddRange(cell.Column);
         this.HintCells.AddRange(cell.Block);
     }
-    public override string StepName() => "Hidden single";
+    public override string StepName() => "OnlyCandidate";
     public override string StepDescription() => "Each row, column, and block can only contain the numbers 1 to 9 exactly once";
 
     public static SolutionStep? TryReduce(Puzzle puzzle) {
@@ -133,7 +133,7 @@ public class HiddenSingleSameRowAndColumn : SolutionStep {
             // If there is only a single value left it's gota be that
             if (numbers.Count == 1) {
                 cell.EnteredValue = numbers[0];
-                return new HiddenSingleSameRowAndColumn(cell, numbers[0]);
+                return new OnlyCandidate(cell, numbers[0]);
             }
         }
         return null;
@@ -143,13 +143,13 @@ public class HiddenSingleSameRowAndColumn : SolutionStep {
 /// <summary>
 /// A step where we look at row, column, and block to identify if a given cell can only take on 1 value
 /// </summary>
-public class HiddenSingleDifferentRowsAndColumns : SolutionStep {
-    public HiddenSingleDifferentRowsAndColumns(Cell cell, int value, List<IEnumerable<Cell>> hints) : base(cell, value) {
+public class Scanning : SolutionStep {
+    public Scanning(Cell cell, int value, List<IEnumerable<Cell>> hints) : base(cell, value) {
         foreach (var hint in hints) {
             this.HintCells.AddRange(hint);
         }
     }
-    public override string StepName() => "Hidden single";
+    public override string StepName() => "Scanning";
     public override string StepDescription() => "A block must contain all values between 1 and 9. By looking at each remaining number we can eliminate particular rows and columns from the block which contain that value. There is only one remaining cell in the block that can be the value and so it must be.";
 
     public static SolutionStep? TryReduce(Puzzle puzzle) {
@@ -228,7 +228,7 @@ public class HiddenSingleDifferentRowsAndColumns : SolutionStep {
                         }
                     }
                     // return step
-                    return new HiddenSingleDifferentRowsAndColumns(cell, value, hints); 
+                    return new Scanning(cell, value, hints); 
                 }
             }
         }
@@ -237,3 +237,18 @@ public class HiddenSingleDifferentRowsAndColumns : SolutionStep {
     }
 
 }
+
+/// <summary>
+/// Eliminating numbers from rows, columns, and boxes
+/// </summary>
+/*public class Elimination : SolutionStep {
+    public static SolutionStep? TryReduce(Puzzle puzzle) {
+        HashSet<int> all_possible = new HashSet<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        foreach (var cell in puzzle.Cells) {
+            if (cell.EnteredValue.HasValue)
+                continue;
+
+
+        }
+    }
+}*/
