@@ -127,7 +127,6 @@ img[b-gt9hgh3kso] {
 
     cursor: pointer;
     
-    background-color: #36393e;
     color: white;
     border-radius: 8px; 
     border-width: 2px;
@@ -135,6 +134,13 @@ img[b-gt9hgh3kso] {
     border-color: white;
     user-select: none;
 }
+.block.odd .cell[b-40bdjbeh19] {
+    background-color: #36393e;
+}
+.block.even .cell[b-40bdjbeh19] {
+    background-color: #515358;
+}
+
 @media (max-width: 640px) {
     .block-row[b-40bdjbeh19] {}
     
@@ -170,11 +176,11 @@ img[b-gt9hgh3kso] {
 }
 
 .cell.highlight[b-40bdjbeh19] {
-    background-color: #7289da;
+    background-color: #7289da !important;
 }
 
 .cell.selected[b-40bdjbeh19] {
-    background-color: #D89216;
+    background-color: #D89216 !important;
 }
 
 .cell.selected:hover[b-40bdjbeh19] {
