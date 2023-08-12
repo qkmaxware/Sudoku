@@ -105,6 +105,8 @@ img[b-gt9hgh3kso] {
 }
 /* /Shared/MainLayout.razor.rz.scp.css */
 footer#attribution[b-6gvxd1wc74] {
+    pointer-events: none;
+    user-select: none;
     position: fixed;
     bottom: 0;
     width: 100%;
