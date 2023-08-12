@@ -141,7 +141,9 @@ public abstract class AStarSolver : IPuzzleSolver {
             if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
 
             // Check "basic" eliminations
-            found = HiddenSingle.TryReduce(puzzle);
+            found = HiddenSingleSameRowAndColumn.TryReduce(puzzle);
+            if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
+            found = HiddenSingleDifferentRowsAndColumns.TryReduce(puzzle);
             if (!ReferenceEquals(found, null)) { steps.Enqueue(found); continue; }
             // TODO double elimination
 

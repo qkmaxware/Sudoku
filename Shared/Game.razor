@@ -23,7 +23,7 @@
         <div @onkeyup=pressChar tabindex="0" class='play-area'>
             <div class="w3-center">
                 <div style="text-align: right;">
-                    <button class="w3-button w3-round w3-flat" style="padding: 0px 12px;" @onclick=openHelp>
+                    <button class="w3-button w3-round w3-flat" style="padding: 0px 12px 0px 0px;" @onclick=openHelp>
                         <Bubble Arrow=@Bubble.Direction.right>Need help?</Bubble>
                     </button>
                 </div>
@@ -60,9 +60,10 @@
                     }
                     @foreach (var step in this.steps) {
                         <div class="w3-card w3-container w3-margin-bottom">
-                            <strong>@step.StepName()</strong>
-                            <p>@step.StepDescription()</p>
+                            <strong>@step.StepName()</strong><br>
+                            <i>Cell(@(step.Cell.CellX), @(step.Cell.CellY)) &larr; @(step.InputValue)</i>
                             @if (first) {
+                                <p>@step.StepDescription()</p>
                                 var firstStep = step;
                                 <div style="text-align: right;">
                                     <button class="w3-button w3-flat font-back" @onclick=@(() => showHelp(firstStep))>Show Me</button>
@@ -170,6 +171,7 @@
     private float custom_percent = 50f;
     public void NewPuzzleCustom() {
         this.mistakes = 0;
+        this.steps.Clear();
         this.currentPuzzle = MakePuzzlePercentExposed(custom_percent / 100f);
         checkRemainingDigits();
         gameTimer?.StartTimer();
