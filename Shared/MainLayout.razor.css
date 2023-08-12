@@ -1,4 +1,6 @@
 footer#attribution {
+    pointer-events: none;
+    user-select: none;
     position: fixed;
     bottom: 0;
     width: 100%;
