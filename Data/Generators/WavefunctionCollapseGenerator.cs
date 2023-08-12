@@ -41,7 +41,8 @@ public class WavefunctionCollapseGenerator : IPuzzleGenerator {
         foreach (var cell in p) {
             cell.ActualValue = 0;
             cell.EnteredValue = null;
-            cell.PotentialValues.AddRange(new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
+            foreach (var value in new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9})
+                cell.PotentialValues.Add(value);
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Sudoku.Data;
@@ -241,14 +242,45 @@ public class Scanning : SolutionStep {
 /// <summary>
 /// Eliminating numbers from rows, columns, and boxes
 /// </summary>
-/*public class Elimination : SolutionStep {
+/// 
+public class SingleElimination : SolutionStep {
+
+    public SingleElimination(Cell cell, int value, List<IEnumerable<Cell>> hints) : base(cell, value) {
+        foreach (var hint in hints) {
+            this.HintCells.AddRange(hint);
+        }
+    }
+    public override string StepName() => "Single Elimination";
+    public override string StepDescription() => "Slowly remove possible values from a cell eliminating these possibilities using the rows and columns from other parts of the puzzle";
+
     public static SolutionStep? TryReduce(Puzzle puzzle) {
+        // Create "initial" set of possibilities
         HashSet<int> all_possible = new HashSet<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         foreach (var cell in puzzle.Cells) {
+            // Cell already has a value
             if (cell.EnteredValue.HasValue)
                 continue;
 
-
+            // Cell can be any of the following values
+            cell.PotentialValues.Clear();
+            foreach (var possible in all_possible) {
+                if (cell.Block.EnteredDigits.Contains(possible)) {
+                    continue;
+                }
+                if (cell.Row.EnteredDigits.Contains(possible)) {
+                    continue;
+                }
+                if (cell.Column.EnteredDigits.Contains(possible)) {
+                    continue;
+                }
+                cell.PotentialValues.Add(possible);
+            }
         }
+
+        // Perform more "in-depth" eliminations to create singletons
+        Dictionary<Cell, List<IEnumerable<Cell>>> eliminations_leading_to_singleton = new Dictionary<Cell, List<IEnumerable<Cell>>>();
+        
+
+        return null;
     }
-}*/
+}

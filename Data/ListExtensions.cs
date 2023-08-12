@@ -21,4 +21,12 @@ public static class ListExtensions {
             return list[0];
         return list[rng.Next(list.Count)];
     }
+
+    public static T Random<T>(this ISet<T> set) {
+        if (set.Count == 0)
+            throw new IndexOutOfRangeException("Random selection requires at least one element");
+        if (set.Count == 1)
+            return set.First();
+        return set.ElementAt(rng.Next(set.Count));
+    }
 }

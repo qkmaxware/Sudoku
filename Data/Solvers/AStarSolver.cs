@@ -136,6 +136,7 @@ public abstract class AStarSolver : IPuzzleSolver {
         // Check "basic" techniques
         Scanning.TryReduce,
         OnlyCandidate.TryReduce,
+        // SingleElimination.TryReduce, // TODO
 
         // TODO more
     };

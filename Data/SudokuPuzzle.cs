@@ -35,6 +35,15 @@ public class RowEnumerator : IEnumerable<Cell> {
         this.Puzzle = puz; this.rowIdx = row;
     }
 
+    public IEnumerable<int> EnteredDigits {
+        get {
+            foreach (var cell in this) {
+                if (cell.EnteredValue.HasValue)
+                    yield return cell.EnteredValue.Value;
+            }
+        }
+    }
+
     public IEnumerator<Cell> GetEnumerator() {
         for (var i = 0; i < 9; i++) {
             yield return Puzzle.GetCell(i, rowIdx);
@@ -51,6 +60,15 @@ public class ColumnEnumerator : IEnumerable<Cell> {
     private int colIdx;
     public ColumnEnumerator(Puzzle puz, int col) {
         this.Puzzle = puz; this.colIdx = col;
+    }
+
+    public IEnumerable<int> EnteredDigits {
+        get {
+            foreach (var cell in this) {
+                if (cell.EnteredValue.HasValue)
+                    yield return cell.EnteredValue.Value;
+            }
+        }
     }
 
     public IEnumerator<Cell> GetEnumerator() {
@@ -85,6 +103,15 @@ public class Block : IEnumerable<Cell> {
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
                 this.cells[i,j] = new Cell(this, i, j);
+            }
+        }
+    }
+
+    public IEnumerable<int> EnteredDigits {
+        get {
+            foreach (var cell in this) {
+                if (cell.EnteredValue.HasValue)
+                    yield return cell.EnteredValue.Value;
             }
         }
     }
@@ -157,6 +184,30 @@ public class Puzzle : IEnumerable<Cell> {
                 return false;
             }
         } 
+        return true;
+    }
+
+    public bool AreEnteredValuesValid() {
+        foreach (var cell in this) {
+            if (!cell.EnteredValue.HasValue) {
+                return false; // Missing value
+            }
+        }
+        foreach (var row in Rows) {
+            var distinct = row.EnteredDigits.GroupBy(x => x).All(g => g.Count() == 1);
+            if (!distinct)
+                return false; // Duplicate value in row
+        }
+        foreach (var column in Columns) {
+            var distinct = column.EnteredDigits.GroupBy(x => x).All(g => g.Count() == 1);
+            if (!distinct)
+                return false; // Duplicate value in column
+        }
+        foreach (var block in Blocks) {
+            var distinct = block.EnteredDigits.GroupBy(x => x).All(g => g.Count() == 1);
+            if (!distinct)
+                return false; // Duplicate value in block
+        }
         return true;
     }
 
