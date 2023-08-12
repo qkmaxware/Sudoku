@@ -148,7 +148,7 @@ public abstract class AStarSolver : IPuzzleSolver {
         do {
             found = null;
             foreach (var reducer in reductions) {
-                found = LastInRow.TryReduce(puzzle);
+                found = reducer.Invoke(puzzle);
                 if (!ReferenceEquals(found, null)) { 
                     steps.Enqueue(found); 
                     break; 

@@ -286,6 +286,22 @@ public class SingleElimination : SolutionStep {
         // Perform more "in-depth" eliminations to create singletons
         Dictionary<Cell, List<IEnumerable<Cell>>> eliminations_leading_to_singleton = new Dictionary<Cell, List<IEnumerable<Cell>>>();
         
+        // If a value only can exist in 1 column/row then eliminate that value from the column/row in all blocks except the current one
+        HashSet<int> remaining_digits_in_block = new HashSet<int>(9);
+        List<int> columnIndices = new List<int>(3);
+        List<int> rowIndices = new List<int>(3);
+        foreach (var block in puzzle.Blocks) {
+            remaining_digits_in_block.Clear();
+            foreach (var digit in block.Where(x => !x.EnteredValue.HasValue).SelectMany(x => x.PotentialValues)) {
+                remaining_digits_in_block.Add(digit);
+            }
+
+            columnIndices.Clear();
+            rowIndices.Clear();
+            foreach (var digit in remaining_digits_in_block) {
+
+            }
+        }
 
         return null;
     }

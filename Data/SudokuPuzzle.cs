@@ -31,6 +31,9 @@ public class Cell {
 public class RowEnumerator : IEnumerable<Cell> {
     private Puzzle Puzzle;
     private int rowIdx;
+
+    public int RowIndex => rowIdx;
+    
     public RowEnumerator(Puzzle puz, int row) {
         this.Puzzle = puz; this.rowIdx = row;
     }
@@ -58,6 +61,9 @@ public class RowEnumerator : IEnumerable<Cell> {
 public class ColumnEnumerator : IEnumerable<Cell> {
     private Puzzle Puzzle;
     private int colIdx;
+
+    public int ColumnIndex => colIdx;
+
     public ColumnEnumerator(Puzzle puz, int col) {
         this.Puzzle = puz; this.colIdx = col;
     }
@@ -93,6 +99,22 @@ public class Block : IEnumerable<Cell> {
     public int CellOffsetY => BlockY * 3;
 
     public Cell this[int x, int y] => cells[x,y];
+
+    public IEnumerable<RowEnumerator> Rows {
+        get {
+            for (var i = 0; i < 3; i++) {
+                yield return new RowEnumerator(Puzzle, this.CellOffsetY + i);
+            }
+        }
+    }
+
+    public IEnumerable<ColumnEnumerator> Columns {
+        get {
+            for (var i = 0; i < 3; i++) {
+                yield return new ColumnEnumerator(Puzzle, this.CellOffsetX + i);
+            }
+        }
+    }
 
     public Block(Puzzle puzzle, int x, int y) {
         this.Puzzle = puzzle;
