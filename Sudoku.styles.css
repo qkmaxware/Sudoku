@@ -104,6 +104,12 @@ img[b-gt9hgh3kso] {
     }   
 }
 /* /Shared/MainLayout.razor.rz.scp.css */
+footer#attribution[b-6gvxd1wc74] {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 8px 12px;
+}
 /* /Shared/PuzzleDrawer.razor.rz.scp.css */
 .block-row[b-40bdjbeh19] {
     text-align: center;
